@@ -101,7 +101,6 @@ public void increment() {
 ### 가시성(Visibility)
 `Java Memmory Model(JMM)`에 따라서 값이 불일치 되는 문제가 발생할 수 있어, 변경된 값을 다른 스레드에서 즉시 볼 수 있도록 보장하도록 하는 방식.  
 - `volatile ` 키워드를 사용해 변수의 값을 `Main Memory`에 즉시 쓰고 읽도록 변경
-- 
 ```java
 private volatile boolean flag = false;
 
