@@ -157,11 +157,11 @@ public static SingletonClass getInstance() {
 물론 단순히 생각해보면 저기에 `Thread`가 동시에 들어올 확률이 얼마나 된다고 큰 문제가 발생하냐고 생각할 수 있지만, 컴퓨터의 연산속도와 `CPU`의 스케쥴링 속도는 엄청난 속도로 반복되므로 그 확률은 무시할 수 없다. 
 실제로도 위의 테스트 케이스를 돌려보면 `Thread`가 100개인 상황에서도 간혈적으로 발생하는데, 실제로 많은 사용자가 이용하는 서비스의 경우에는 발생 확률이 늘어서 해결해야할 문제가 될 것이다.
 
-### 구현 모델
+## 구현 모델
 이 처럼 `Multi-thread` 환경에서 발생하는 동시성 문제를 해결하고자 수 많은 개발자는 싱글톤 패턴의 이점을 살리고자 많은 방식을 제시하고 구현하는 등 노력을 기울였다.
 그렇다면 현재 제시되어온 구현 모델을 하나씩 살펴보고 해결 했던 방식과 발생했던 문제를 살펴보자
 
-#### 모델 1. Eager Initialization 이른 초기화 모델
+### 모델 1. Eager Initialization 이른 초기화 모델
 ```java
 public class EagerSingleton {
     private static final EagerSingleton instance = new EagerSingleton();
@@ -175,14 +175,14 @@ public class EagerSingleton {
 ```
 이 코드는 처음 싱글톤 패턴을 설명하기 위해서 사용 되었던 구현 모델로 **클래스의 인스턴스가 `JVM`의 `ClassLoader`가 `Loading`하는 과정에서 생성되어 메모리에 올라가기 때문에 `Multi-thread` 환경에서도 안전하게 사용**이 가능하다.
 하지만, 생성된 인스턴스가 실제로 사용되지 않을 경우에는 해당 인스턴스는 결국 불필요한 메모리를 차지하는 문제가 발생한다.
-##### 해결한 문제
+#### 해결한 문제
 - `Thread-safety`한 싱글톤 패턴을 보장
 
-##### 고려해야할 문제
+#### 고려해야할 문제
 - 실제로 사용되지 않는 클래스일 경우, 불 필요한 메모리 자원이 사용됨
 - 본 클래스의 인스턴스가 비용이 클 수록 더 큰 자원의 낭비가 야기됨
 
-#### 모델 2. Lazy Initialization 늦은 초기화 모델
+### 모델 2. Lazy Initialization 늦은 초기화 모델
 ```Java
 public class LazySingleton {
     private static LazySingleton instance;
@@ -199,12 +199,12 @@ public class LazySingleton {
 ```
 본 모델은 **`JVM`에 초기 인스턴스 생성을 위임한 `Eager Initialization`의 자원 낭비 문제점을 해결하고자 인스턴스 생성을 첫 요청으로 변경**시킨 코드이다.
 앞서 설명했듯이 해당 구현 모델은 대표적으로 `Multi-thread` 환경에서의 동시성 문제를 발생시킨다.
-##### 해결한 문제
+#### 해결한 문제
 - 실제로 사용되지 않는 클래스에 대해서 인스턴스를 생성하지 않기 때문에 자원 낭비를 방지
-##### 고려해야할 문제
+#### 고려해야할 문제
 - `Thread-safety`하지 않음 여러 스레드가 동시에 인스턴스 생성에 진입할 경우, 고유하지 않은 인스턴스가 생성될 문제가 있음
 
-#### 모델 3. Synchronized Lazy Initialization 늦은 동기화 모델
+### 모델 3. Synchronized Lazy Initialization 늦은 동기화 모델
 ```Java
 public class SynchronizedLazySingleton {
     private static SynchronizedLazySingleton instance;
@@ -222,12 +222,12 @@ public class SynchronizedLazySingleton {
 이 모델은 `Lazy Initialization`의 스레드간 경쟁(`Race Condition`)으로 발생하는 `Thread-safety`하지 않는 문제를 해결하고자 한 모델로, 여러 스레드 중 먼저 `getInstance()`에 진입될 경우 다른 스레드는 먼저 진입한 스레드가 종료될 때 까지 대기하는 상태가 된다.
 이 결과로 애플리케이션 전체에 대해서 고유한 객체를 보장할 수  있게 되어 **`Thread-seafety`성질을 보장할 수 있게 된다. 하지만, 동기화(`Synchronized`)에서 대기하는 과정이 추가되면서 생성이 되었음에도 한 번에 하나의 스레드만 `getInstance()` 진행할 수 있기 떄문에 전체적인 성능 저하를 발생**시키게 된다.
 ![img_1.png](../images/synchronized_singleton.png)
-##### 해결한 문제
+#### 해결한 문제
 - `Thread-safety`보장해 `Multi-thread`환경에서도 안정적인 싱글톤 패턴 구현 가능
-##### 고려해야할 문제
+#### 고려해야할 문제
 - `Synchronizaed`과정으로 발생하는 성능 저하
 
-#### 모델 4. Double-Checked Locking 더블 체크 락킹 모델
+### 모델 4. Double-Checked Locking 더블 체크 락킹 모델
 ```java
 public class DoubleCheckedLockingSingleton {
     private static volatile DoubleCheckedLockingSingleton instance;
@@ -252,27 +252,27 @@ public class DoubleCheckedLockingSingleton {
 > `Java`에서 성능을 위해서 각각의 스레드들은 변수를 메인 메모리(`RAM`)으로 부터 데이터를 가져오는 것이 아니라 캐시 메모리(`CPU Cache`) 가져온다. 
 > 하지만 이 구조는 스레드별 다른 캐시 메모리에 접근해서 변수 값을 가져올 경우에 일치하지 않는 문제를 야기 시키는 문제가 발생해, `volatile` 키워드로 변수를 선언해 값을 캐시가 아닌 메인 메모리에 직접적으로 `I/O` 할 수 있도록 지정한다.
 > 
-##### 해결한 문제
+#### 해결한 문제
 - 동기화 블록을 통해서 `Thread-safety`를 보장해 `Multi-thread`환경에서도 안정적인 싱글톤 패턴 구현 가능
 - 이미 인스턴스화가 진행된 후 동기화 블록에 진입되지 않기 떄문에 `Synchronized Lazy Initialization` 보다 높은 성능을 보여줌 
-##### 고려해야할 문제
+#### 고려해야할 문제
 - `volatile`키워드로 인한 복잡성과 세밀한 구현 방식이 요구됨
 - `Synchronized` 블록이 메소드에 선언되어있지 않아 동기화 블록을 줄일 수 있지만, 초기에 발생되는 동기화 과정으로 발생되는 성능 문제는 고려 
 
-#### 모델 5. Enum 모델
+### 모델 5. Enum 모델
 ```java
 public enum EnumSingleton {
     INSTANCE
 }
 ```
-`Java`에서의 `Enum`형식을 이용해서 싱글톤 패턴을 간단하게 구현할 수 있는 모델이다. 해당 방식을 사용할 경우 `Thread-safety`성질을 `Compiler`와 `JVM`에 의해서 보장할 수 있다.
-##### 해결한 문제
+`Java`에서의 `Enum`형식을 이용할 경우 초기 인스턴스 생성을 `Compiler`와 `JVM`에 위임할 수 있기에 `Thread-safety`성질을 안전하게 보장할 수 있어 싱글톤 패턴을 간단하게 구현할 수 있는 모델이다.
+#### 해결한 문제
 - `Compiler`와 `JVM`에 인스턴스 생성을 위임했기에 `Thread-safety`함 
 - 매우 간단한 구현으로 싱글톤이 구현이 가능
-##### 고려해야할 문제
+#### 고려해야할 문제
 - `Enum` 타입의 제약으로 상속을 지원하지 않고, 실제 사용에 대해서는 유연하지 못함
 
-#### 모델 6. Lazy Holder 모델
+### 모델 6. Lazy Holder 모델
 ```java
 public class HolderSingleton {
     private HolderSingleton() { }
@@ -286,3 +286,15 @@ public class HolderSingleton {
     }
 }
 ```
+본 구현 모델은 **정적 중첩 클래스를`Static Nested Class`을 활용해 초기 인스턴스를 생성하는 역할을 `JVM`에 위임하여 `Thread-safety`를 입증하고, `Lazy Initialization` 모델을 활용해 자원 효율성까지 보장**할 수 있다.
+얼핏 보면 단순 `Eager Initialization`과 동일하게 작동할 수 있게 볼 수 있지만 `Holder`라는 내부 클래스를 배치함으로써 `JVM`의 `ClassLoader`에 의해서 로드될 때는 `instance`가 초기화되지 않고, `getInstance()`가 처음 호출 될 때 초기화되어 인스턴스가 생성된다.
+따라서, `Thread-safety` 성질은 온전히 `JVM`에 위임할 수 있어 안정적으로 단일 인스턴스를 보장함과 동시에 불필요한 초기화과정을 생략할 수 있어서 자원의 효율까지 보장되었다.
+#### 해결한 문제
+- `Compiler`와 `JVM`에 인스턴스 생성을 위임했기에 `Thread-safety`함
+- `Eager Initialization`와 달리 내부 클래스를 배치해 클래스 로드 과정에서 인스턴스화 하지 않고, `getInstance()`시 인스턴스화하여 불필요한 메모리 낭비를 줄임
+#### 고려해야할 문제
+- 정확한 인스턴스 시점을 파악하기 어려움
+- 객체의 초기화 리소스가 크다면 첫 호출 시 상대적으로 속도가 저하되는 문제가 발생될 가능성이 있음
+
+
+
