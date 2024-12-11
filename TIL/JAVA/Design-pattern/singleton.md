@@ -251,7 +251,6 @@ public class DoubleCheckedLockingSingleton {
 > `volatile` 키워드
 > `Java`에서 성능을 위해서 각각의 스레드들은 변수를 메인 메모리(`RAM`)으로 부터 데이터를 가져오는 것이 아니라 캐시 메모리(`CPU Cache`) 가져온다. 
 > 하지만 이 구조는 스레드별 다른 캐시 메모리에 접근해서 변수 값을 가져올 경우에 일치하지 않는 문제를 야기 시키는 문제가 발생해, `volatile` 키워드로 변수를 선언해 값을 캐시가 아닌 메인 메모리에 직접적으로 `I/O` 할 수 있도록 지정한다.
-> ![img_2.png](../images/volatile_1.png) 
 > 
 ##### 해결한 문제
 - 동기화 블록을 통해서 `Thread-safety`를 보장해 `Multi-thread`환경에서도 안정적인 싱글톤 패턴 구현 가능
@@ -263,9 +262,15 @@ public class DoubleCheckedLockingSingleton {
 #### 모델 5. Enum 모델
 ```java
 public enum EnumSingleton {
-    INSTANCE;
+    INSTANCE
 }
 ```
+`Java`에서의 `Enum`형식을 이용해서 싱글톤 패턴을 간단하게 구현할 수 있는 모델이다. 해당 방식을 사용할 경우 `Thread-safety`성질을 `Compiler`와 `JVM`에 의해서 보장할 수 있다.
+##### 해결한 문제
+- `Compiler`와 `JVM`에 인스턴스 생성을 위임했기에 `Thread-safety`함 
+- 매우 간단한 구현으로 싱글톤이 구현이 가능
+##### 고려해야할 문제
+- `Enum` 타입의 제약으로 상속을 지원하지 않고, 실제 사용에 대해서는 유연하지 못함
 
 #### 모델 6. Lazy Holder 모델
 ```java
