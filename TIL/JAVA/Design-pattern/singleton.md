@@ -152,7 +152,7 @@ public static SingletonClass getInstance() {
 **만약 여러개의 `Thread`가 동시에 `if` 조건 분기에 도달하여 실행되었다고 가정해보자, 그럼 해당 클래스에는 생성된 인스턴스가 존재하지 않기 때문에 스레드는 `null`로 판단한여 새로운 인스턴스를 생성**하게 될 것이다.
 결국 아래 그림 처럼 접근한 `Thread`는 각자가 생성한 인스턴스를 반환하게 되는 경우가 발생하게 된다.
 
-![img.png](img.png)
+![img.png](../images/singleton.png)
 
 물론 단순히 생각해보면 저기에 `Thread`가 동시에 들어올 확률이 얼마나 된다고 큰 문제가 발생하냐고 생각할 수 있지만, 컴퓨터의 연산속도와 `CPU`의 스케쥴링 속도는 엄청난 속도로 반복되므로 그 확률은 무시할 수 없다. 
 실제로도 위의 테스트 케이스를 돌려보면 `Thread`가 100개인 상황에서도 간혈적으로 발생하는데, 실제로 많은 사용자가 이용하는 서비스의 경우에는 발생 확률이 늘어서 해결해야할 문제가 될 것이다.
@@ -221,7 +221,7 @@ public class SynchronizedLazySingleton {
 ```
 이 모델은 `Lazy Initialization`의 스레드간 경쟁(`Race Condition`)으로 발생하는 `Thread-safety`하지 않는 문제를 해결하고자 한 모델로, 여러 스레드 중 먼저 `getInstance()`에 진입될 경우 다른 스레드는 먼저 진입한 스레드가 종료될 때 까지 대기하는 상태가 된다.
 이 결과로 애플리케이션 전체에 대해서 고유한 객체를 보장할 수  있게 되어 **`Thread-seafety`성질을 보장할 수 있게 된다. 하지만, 동기화(`Synchronized`)에서 대기하는 과정이 추가되면서 생성이 되었음에도 한 번에 하나의 스레드만 `getInstance()` 진행할 수 있기 떄문에 전체적인 성능 저하를 발생**시키게 된다.
-![img_1.png](img_1.png)
+![img_1.png](../images/synchronized_singleton.png)
 ##### 해결한 문제
 - `Thread-safety`보장해 `Multi-thread`환경에서도 안정적인 싱글톤 패턴 구현 가능
 ##### 고려해야할 문제
@@ -251,7 +251,7 @@ public class DoubleCheckedLockingSingleton {
 > `volatile` 키워드
 > `Java`에서 성능을 위해서 각각의 스레드들은 변수를 메인 메모리(`RAM`)으로 부터 데이터를 가져오는 것이 아니라 캐시 메모리(`CPU Cache`) 가져온다. 
 > 하지만 이 구조는 스레드별 다른 캐시 메모리에 접근해서 변수 값을 가져올 경우에 일치하지 않는 문제를 야기 시키는 문제가 발생해, `volatile` 키워드로 변수를 선언해 값을 캐시가 아닌 메인 메모리에 직접적으로 `I/O` 할 수 있도록 지정한다.
-> ![img_2.png](img_2.png) 
+> ![img_2.png](../images/volatile_1.png) 
 > 
 ##### 해결한 문제
 - 동기화 블록을 통해서 `Thread-safety`를 보장해 `Multi-thread`환경에서도 안정적인 싱글톤 패턴 구현 가능
