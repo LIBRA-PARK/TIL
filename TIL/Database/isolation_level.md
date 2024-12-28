@@ -76,3 +76,6 @@
 | **READ COMMITTED**   | Dirty Read                       | Dirty Read 방지, 트랜잭션 간 균형 제공 | Non-Repeatable Read, 팬텀 리드 가능 |
 | **REPEATABLE READ**  | Dirty Read, Non-Repeatable Read   | 데이터 읽기의 일관성 보장           | 팬텀 리드 발생 가능, 성능 저하 가능성 |
 | **SERIALIZABLE**     | Dirty Read, Non-Repeatable Read, Phantom Read | 데이터 무결성과 일관성 보장, 모든 문제 방지 | 성능 저하, 데드락 가능성, 낮은 동시성 |
+
+## Reference
+[10분 테코톡 - 러쉬의 MySQL 트랜잭션 격리 수준](https://youtu.be/QHWwNTGkwAU?si=W8ZJkbtUTpi3Fq50)
