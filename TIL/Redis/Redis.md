@@ -1,0 +1,1 @@
+[레디스 해결](https://nooblette.tistory.com/entry/시스템-디자인-실습으로-배우는-선착순-이벤트-시스템-13-동시성-이슈와-Redis로-해결하기)
